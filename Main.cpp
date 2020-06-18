@@ -5,19 +5,12 @@
 #define EOL t_EOL 255
 using byte = unsigned char; 
 using namespace std; 
-//#include <string.h> 
-//int incomingByte = 0; // for incoming serial data
-//String a;
 
 byte buffer [20];
-
 byte newChar;
 int job = 0; 
-
 int index = 0 ; 
 int length = 0; 
-
-
 byte array [4];
 
 void setup() {
@@ -27,14 +20,6 @@ void setup() {
 
 void loop()
 {
-    //Serial.println("hello world");
-    //Serial.readString();
-    //delay(100000);
-    //byte array [4];
-    
-    //digitalWrite(13,HIGH);delay(1000);
-    //digitalWrite(13,LOW);delay(1000);
-
     switch (job){
         case 0: 
             Serial.print("Enter a commaand: ");
