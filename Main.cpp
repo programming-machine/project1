@@ -15,6 +15,7 @@ byte newChar;
 int job = 0; 
 
 int index = 0 ; 
+int length = 0; 
 
 
 byte array [4];
@@ -36,22 +37,33 @@ void loop()
 
     switch (job){
         case 0: 
-            Serial.println("Enter a commaand: ");
+            Serial.print("Enter a commaand: ");
             job ++;
             break;
         case 1:
             while (Serial.available()){
                 newChar = Serial.read(); // read the incoming data as string
                 buffer[index] = newChar;
+                    Serial.print((char)buffer[index]);
                 index ++;
                     if (newChar == 13){
+                        length = index;
                         index = 0;
                         job ++;
+                        Serial.print('\n');
                         break;
                     }
-            }  
+            }
+
+
+
         break; 
         case 2:
+                //for (int i = 0; i < length -1 ; i ++ )
+                //{
+                //    Serial.print((char) buffer[i] );
+                //}
+                //length = 0;
                 job = 0;
                 break;
         default:
