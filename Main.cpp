@@ -44,26 +44,20 @@ void loop()
             while (Serial.available()){
                 newChar = Serial.read(); // read the incoming data as string
                 buffer[index] = newChar;
-                    Serial.print((char)buffer[index]);
-                index ++;
-                    if (newChar == 13){
-                        length = index;
-                        index = 0;
-                        job ++;
-                        Serial.print('\n');
-                        break;
-                    }
+                Serial.print((char)buffer[index]);
+                if(newChar != 13){
+                    index ++;
+                }else{
+                    buffer[index] = 0;
+                    index = 0;
+                    job ++;
+                    Serial.print('\n');
+                    break;
+                }
             }
 
-
-
-        break; 
+                break; 
         case 2:
-                //for (int i = 0; i < length -1 ; i ++ )
-                //{
-                //    Serial.print((char) buffer[i] );
-                //}
-                //length = 0;
                 job = 0;
                 break;
         default:
