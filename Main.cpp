@@ -22,11 +22,13 @@ byte newChar;
 byte job = 0; 
 byte index = 0 ; 
 byte length = 0; 
-byte tokenBuffer [10];
+byte tokenBuffer [30];
 byte command_length;
 byte first_char;
 byte second_char;
 byte count_letter = 0;
+byte token_buffer_count =0;
+
 
 
 byte lookUp_array[13][4] = 
@@ -57,35 +59,50 @@ void loop()
                     index ++;
                 }else{
                     buffer[index] = 0;
-                    index = 0;
                     length = index;
                     job ++;
                     Serial.print('\n');
+                    index = 0;
                     break;
                 }
             }
 
                 break; 
         case 2:
+                
                 for (byte i = 0 ; i < length ; i++){
-                    if (buffer[i] != ' ' &&  buffer[i] != 0 ){
+                    
+                    if (buffer[i] != ' ' && buffer[i] != 0){
                         if (count_letter == 0){
-                            first_char  = buffer[i];
+                                first_char  = (byte)buffer[i];
+                                //Serial.print((char)first_char);
                         }else if( count_letter == 1){
-                            second_char = buffer[i]; 
+                                second_char = (byte)buffer[i];
+                                //Serial.print((char)second_char); 
                         }  
                         count_letter ++;
+                        Serial.println(count_letter);
                             
                     }else{
                         // look up                            
                         for (byte i = 0; i < 13; i ++){
                                 if (first_char == lookUp_array [i][0] && 
-                                    second_char == lookUp_array[i][1] && count_letter == lookUp_array[i][2] ) {
+                                    second_char == lookUp_array[i][1] && 
+                                    count_letter == lookUp_array[i][2] ) {
+                                    tokenBuffer[token_buffer_count] = lookUp_array[3];
+                                    token_buffer_count ++;
+                                    //Serial.print("hi");
                                 } 
                         }
                         count_letter = 0;
                     }
                 }
+                //Serial.print("hi");
+                for (byte i = 0; i < token_buffer_count ; i ++ ){
+                    Serial.print((int)tokenBuffer[i]);
+                }
+                //Serial.print("hi");    
+                token_buffer_count = 0;
                 job = 0;
                 break;
         default:
