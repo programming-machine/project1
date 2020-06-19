@@ -117,7 +117,7 @@ void loop()
 
                    if ( (count_space == 1|| i == length -1) &&  command_length !=0  ) {
                       final_length = command_length; 
-                      Serial.println( final_length );
+                      //Serial.println( final_length );
 
                             // look up
                     for (byte i = 0; i < 13 ; i ++){
@@ -130,11 +130,6 @@ void loop()
                     }
                     }
 
-              
-                 
-
-
-
                 }
                 
                     for (byte i = 0; i < token_buffer_count ; i ++)
@@ -142,6 +137,8 @@ void loop()
                         Serial.print((byte)tokenBuffer[i]);
                         Serial.print( ' ' );
                     }
+
+                     Serial.println(  );
                 job = 0;
                 count_letter = 0;
                 command_length = 0;
