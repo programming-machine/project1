@@ -55,6 +55,18 @@ void loop()
                 newChar = Serial.read(); // read the incoming data as string
                 buffer[index] = newChar;
                 Serial.print( buffer[index]);
+                
+                // if (newChar != 127){
+                //     buffer[index] = newChar;
+                //     Serial.print( buffer[index]);
+                // }else{
+                //     //buffer[index] = buffer[ index + 1] ;
+                //     buffer.remove(index)
+                //     Serial.print( buffer[index]);
+                //     index = index -1;
+                
+                // }
+
                 if(newChar != 13){
                     index ++;
                 }else{
@@ -62,7 +74,10 @@ void loop()
                     length = index;
                     job ++;
                     Serial.print('\n');
+                    
+                    //Serial.print((byte)buffer[length]); // works
                     index = 0;
+                    //count_letter = 0;
                     break;
                 }
             }
@@ -70,40 +85,44 @@ void loop()
                 break; 
         case 2:
                 
-                for (byte i = 0 ; i < length ; i++){
-                    
-                    if (buffer[i] != ' ' && buffer[i] != 0){
+                for (byte i = 0 ; i < length  ; i++){
+
+                    if (buffer[i] != ' ' ){
                         if (count_letter == 0){
                                 first_char  = (byte)buffer[i];
-                                //Serial.print((char)first_char);
+                                Serial.print((char)first_char);  // works
                         }else if( count_letter == 1){
                                 second_char = (byte)buffer[i];
-                                //Serial.print((char)second_char); 
+                                Serial.print((char)second_char); // works
+                        }
+
+                        if (buffer[i] != 0){
+                            count_letter ++;
+
                         }  
-                        count_letter ++;
-                        Serial.println(count_letter);
+                        //Serial.println(count_letter);
+                        //Serial.println(count_letter); // works
                             
                     }else{
-                        // look up                            
-                        for (byte i = 0; i < 13; i ++){
-                                if (first_char == lookUp_array [i][0] && 
-                                    second_char == lookUp_array[i][1] && 
-                                    count_letter == lookUp_array[i][2] ) {
-                                    tokenBuffer[token_buffer_count] = lookUp_array[3];
-                                    token_buffer_count ++;
-                                    //Serial.print("hi");
-                                } 
-                        }
+                        //Serial.println(count_letter);
                         count_letter = 0;
                     }
+                    //Serial.print((char)first_char);
+                    //Serial.print((char)second_char);
+                    Serial.println(count_letter);
+
                 }
                 //Serial.print("hi");
-                for (byte i = 0; i < token_buffer_count ; i ++ ){
-                    Serial.print((int)tokenBuffer[i]);
-                }
+                //for (byte i = 0; i < token_buffer_count ; i ++ ){
+                //    Serial.print((int)tokenBuffer[i]);
+                //}
                 //Serial.print("hi");    
-                token_buffer_count = 0;
+                //token_buffer_count = 0;
                 job = 0;
+                count_letter = 0;
+                for (byte i = 0; i < length; i ++){
+                        buffer[i] = 0;
+                    }
                 break;
         default:
                 break;  
