@@ -5,7 +5,7 @@
 #define      t_EOL 255
 #define      t_D13 13
 #define       t_ON 1
-#define      t_OFF 0
+#define      t_OFF 100
 #define    t_BLINK 3
 #define    t_GREEN 4
 #define      t_SET 6
@@ -17,23 +17,25 @@
 using byte = unsigned char; 
 using namespace std; 
 
-char buffer [20];
+char buffer [40];
 byte newChar;
 byte job = 0; 
 byte index = 0 ; 
 byte length = 0; 
 byte tokenBuffer [30];
-byte command_length;
 byte first_char;
 byte second_char;
 byte count_letter = 0;
 byte token_buffer_count =0;
+byte command_length =0;
+byte count_space = 0;
+byte final_length;
 
 
 
 byte lookUp_array[13][4] = 
 {{'l','e',3,t_LED},{'r','e',3,t_RED},{'e','o',3,t_EOL},{'d','1',3,t_D13},{'o','n',2,t_ON},
-{'o','f',2,t_OFF},{'b','l',5,t_BLINK},{'g','r',5,t_GREEN},{'s','e',3,t_SET},{'s','t',6,t_STATUS},
+{'o','f',3,t_OFF},{'b','l',5,t_BLINK},{'g','r',5,t_GREEN},{'s','e',3,t_SET},{'s','t',6,t_STATUS},
 {'l','e',4,t_LEDS},{'v','e',7,t_VERSION},{'h','e',4,t_HELP}};
 
 
@@ -86,43 +88,73 @@ void loop()
         case 2:
                 
                 for (byte i = 0 ; i < length  ; i++){
-
+                        
                     if (buffer[i] != ' ' ){
+                        count_space = 0;
                         if (count_letter == 0){
                                 first_char  = (byte)buffer[i];
-                                Serial.print((char)first_char);  // works
+                                //Serial.print((char)first_char);  // works
                         }else if( count_letter == 1){
                                 second_char = (byte)buffer[i];
-                                Serial.print((char)second_char); // works
+                                //Serial.print((char)second_char); // works
                         }
 
                         if (buffer[i] != 0){
                             count_letter ++;
+                        }
 
-                        }  
-                        //Serial.println(count_letter);
-                        //Serial.println(count_letter); // works
-                            
+                        if ( i == length -1 )
+                        {
+                        command_length = count_letter;    
+                        }
+                              
                     }else{
-                        //Serial.println(count_letter);
+                        count_space ++;
+                        command_length = count_letter;    
+                        // }
                         count_letter = 0;
                     }
-                    //Serial.print((char)first_char);
-                    //Serial.print((char)second_char);
-                    Serial.println(count_letter);
+
+                   if ( (count_space == 1|| i == length -1) &&  command_length !=0  ) {
+                      final_length = command_length; 
+                      Serial.println( final_length );
+
+                            // look up
+                    for (byte i = 0; i < 13 ; i ++){
+                        if (lookUp_array[i][0] == first_char && lookUp_array[i][1] == second_char && 
+                        lookUp_array[i][2] == final_length ){
+                          //Serial.println("hi");
+                          tokenBuffer[token_buffer_count] = lookUp_array[i][3];
+                          token_buffer_count ++; 
+                        }
+                    }
+                    }
+
+              
+                 
+
+
 
                 }
-                //Serial.print("hi");
-                //for (byte i = 0; i < token_buffer_count ; i ++ ){
-                //    Serial.print((int)tokenBuffer[i]);
-                //}
-                //Serial.print("hi");    
-                //token_buffer_count = 0;
+                
+                    for (byte i = 0; i < token_buffer_count ; i ++)
+                    {
+                        Serial.print((byte)tokenBuffer[i]);
+                        Serial.print( ' ' );
+                    }
                 job = 0;
                 count_letter = 0;
+                command_length = 0;
                 for (byte i = 0; i < length; i ++){
                         buffer[i] = 0;
                     }
+                token_buffer_count = 0;
+
+                for (byte i = 0; i < token_buffer_count; i ++){
+                        tokenBuffer[i] = 0;
+                    }
+
+
                 break;
         default:
                 break;  
