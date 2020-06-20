@@ -70,16 +70,26 @@ void turn_off (){
 void blink_led (byte last_color){
     //time = millis();
  
-    if (last_color == 0 ){
-        
-        while(true){
+    if (last_color == 0 || last_color == t_RED ){
+        for (int i = 0 ; i < 10; i ++){
             turn_red();
             delay(500);
             turn_off();
             delay(500);
-        }
-        
+        }    
+    }else{
+
+            for (int i = 0 ; i < 10; i ++){
+            turn_green();
+            delay(500);
+            turn_off();
+            delay(500);
+        }    
+
     }
+        
+            
+    
 
 }
 
@@ -201,7 +211,7 @@ void loop()
                         last_color = t_GREEN;
                         break;
                     case t_BLINK:
-                        blink_led(last_color);
+                        blink_led(last_color);    
                         last_color = 0;
                         break;
                     case t_ON:
@@ -213,6 +223,7 @@ void loop()
                     default:
                         break;
                     }
+                break;
                 case t_HELP:
                     Serial.println();
                     Serial.println();
@@ -223,7 +234,8 @@ void loop()
                     Serial.println( "blink: led blinks" );
                     Serial.println();
                     Serial.println();
-                        break;
+                break;
+                
                 default:
                     break;
 
