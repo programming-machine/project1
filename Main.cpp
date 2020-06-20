@@ -29,7 +29,8 @@ byte count_letter = 0;
 byte token_buffer_count =0;
 byte command_length =0;
 byte count_space = 0;
-byte final_length;
+byte final_length = 0 ; //just added
+byte last_color = 0;
 
 
 
@@ -66,6 +67,23 @@ void turn_off (){
 }
 
 
+void blink_led (byte last_color){
+    //time = millis();
+ 
+    if (last_color == 0 ){
+        
+        while(true){
+            turn_red();
+            delay(500);
+            turn_off();
+            delay(500);
+        }
+        
+    }
+
+}
+
+
 
 void setup() {
     Serial.begin(9600);
@@ -81,6 +99,7 @@ void setup() {
 
 void loop()
 {
+    //time = millis();
     switch (job){
         case 0: 
             Serial.print("Enter a commaand: ");
@@ -175,9 +194,15 @@ void loop()
                     {
                     case t_RED:
                         turn_red();
+                        last_color = t_RED;
                         break;
                     case t_GREEN:
                         turn_green();
+                        last_color = t_GREEN;
+                        break;
+                    case t_BLINK:
+                        blink_led(last_color);
+                        last_color = 0;
                         break;
                     case t_ON:
                         turn_on();
@@ -188,9 +213,20 @@ void loop()
                     default:
                         break;
                     }
-                
+                case t_HELP:
+                    Serial.println();
+                    Serial.println();
+                    Serial.println( "on: turns on" );
+                    Serial.println( "off: turns off" );
+                    Serial.println( "green: truns Green" );
+                    Serial.println( "red: truns RED" );
+                    Serial.println( "blink: led blinks" );
+                    Serial.println();
+                    Serial.println();
+                        break;
                 default:
                     break;
+
                 }
                     
                     for (byte i = 0; i <= token_buffer_count ; i ++){
