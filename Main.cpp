@@ -179,25 +179,15 @@ void loop()
                     case t_GREEN:
                         turn_green();
                         break;
-                    default:
-                        break;
-                    }
                     case t_ON:
-                        //turn_on();
+                        turn_on();
                         break;
-
                     case t_OFF:
                         turn_off();
                         break;
-                    break;
-                
-                // case t_ON:
-                //     turn_on();
-                //     break;
-
-                // case t_OFF:
-                //     turn_off();
-                //     break;
+                    default:
+                        break;
+                    }
                 
                 default:
                     break;
