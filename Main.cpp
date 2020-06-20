@@ -38,12 +38,46 @@ byte lookUp_array[13][4] =
 {'o','f',3,t_OFF},{'b','l',5,t_BLINK},{'g','r',5,t_GREEN},{'s','e',3,t_SET},{'s','t',6,t_STATUS},
 {'l','e',4,t_LEDS},{'v','e',7,t_VERSION},{'h','e',4,t_HELP}};
 
+void turn_red (){
+    digitalWrite(3, LOW);
+    digitalWrite(2, HIGH );
+
+
+}
+
+void turn_green (){
+    digitalWrite(2, LOW);
+    digitalWrite(3, HIGH );
+
+}
+
+
+void turn_on (){
+    digitalWrite(2, LOW);
+    digitalWrite(3, HIGH );
+
+}
+
+
+void turn_off (){
+    digitalWrite(2, HIGH);
+    digitalWrite(3, HIGH );
+
+}
+
 
 
 void setup() {
     Serial.begin(9600);
-    pinMode(13,OUTPUT);
+    pinMode(2,OUTPUT);
+    pinMode(3,OUTPUT);
+    //digitalWrite(3, LOW);
+    //digitalWrite(2, HIGH );
+    //turn_green();
+
 }
+
+
 
 void loop()
 {
@@ -131,12 +165,50 @@ void loop()
                     }
 
                 }
-                
-                    for (byte i = 0; i < token_buffer_count ; i ++)
+
+                tokenBuffer[token_buffer_count] = t_EOL;
+
+                switch (tokenBuffer[0])
+                {
+                case t_LED:
+                    switch (tokenBuffer[1])
                     {
+                    case t_RED:
+                        turn_red();
+                        break;
+                    case t_GREEN:
+                        turn_green();
+                        break;
+                    default:
+                        break;
+                    }
+                    case t_ON:
+                        //turn_on();
+                        break;
+
+                    case t_OFF:
+                        turn_off();
+                        break;
+                    break;
+                
+                // case t_ON:
+                //     turn_on();
+                //     break;
+
+                // case t_OFF:
+                //     turn_off();
+                //     break;
+                
+                default:
+                    break;
+                }
+                    
+                    for (byte i = 0; i <= token_buffer_count ; i ++){
                         Serial.print((byte)tokenBuffer[i]);
                         Serial.print( ' ' );
                     }
+
+
 
                      Serial.println(  );
                 job = 0;
