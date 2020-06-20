@@ -31,6 +31,7 @@ byte command_length =0;
 byte count_space = 0;
 byte final_length = 0 ; //just added
 byte last_color = 0;
+byte led = 13;;
 
 
 
@@ -38,6 +39,16 @@ byte lookUp_array[13][4] =
 {{'l','e',3,t_LED},{'r','e',3,t_RED},{'e','o',3,t_EOL},{'d','1',3,t_D13},{'o','n',2,t_ON},
 {'o','f',3,t_OFF},{'b','l',5,t_BLINK},{'g','r',5,t_GREEN},{'s','e',3,t_SET},{'s','t',6,t_STATUS},
 {'l','e',4,t_LEDS},{'v','e',7,t_VERSION},{'h','e',4,t_HELP}};
+
+void D13_turn_on (){
+    digitalWrite(led, HIGH );
+}
+
+void D13_turn_off (){
+    digitalWrite(led, LOW );
+}
+
+
 
 void turn_red (){
     digitalWrite(3, LOW);
@@ -61,6 +72,7 @@ void turn_on (){
 
 
 void turn_off (){
+    
     digitalWrite(2, HIGH);
     digitalWrite(3, HIGH );
 
@@ -97,6 +109,7 @@ void blink_led (byte last_color){
 
 void setup() {
     Serial.begin(9600);
+    pinMode(led, OUTPUT);
     pinMode(2,OUTPUT);
     pinMode(3,OUTPUT);
     //digitalWrite(3, LOW);
@@ -234,6 +247,22 @@ void loop()
                     Serial.println( "blink: led blinks" );
                     Serial.println();
                     Serial.println();
+                break;
+
+                case t_D13:
+
+                    switch (tokenBuffer[1])
+                    {
+                    case t_ON:
+                        D13_turn_on();
+                        break;
+                    case t_OFF:
+                        D13_turn_off();
+                        break;
+                    
+                    default:
+                        break;
+                    }
                 break;
                 
                 default:
