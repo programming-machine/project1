@@ -34,7 +34,7 @@ byte count_space = 0;
 byte final_length = 0 ; //just added
 byte last_color = 0;
 byte led = 13;;
-word interval = 0;
+word interval = 500;
 byte count_digits = 0;
 byte number_array [10];
 byte done_counting = 0 ;
@@ -47,6 +47,11 @@ byte lookUp_array[13][4] =
 {'o','f',3,t_OFF},{'b','l',5,t_BLINK},{'g','r',5,t_GREEN},{'s','e',3,t_SET},{'s','t',6,t_STATUS},
 {'l','e',4,t_LEDS},{'v','e',7,t_VERSION},{'h','e',4,t_HELP}};
 
+
+
+
+
+
 void D13_turn_on (){
     digitalWrite(led, HIGH );
 }
@@ -56,13 +61,14 @@ void D13_turn_off (){
 }
 
 
-void D13_turn_blink (){
+void D13_turn_blink ( word interval ){
+
 
     for (byte i = 0; i < 10; i++){
         digitalWrite(led, HIGH );
-        delay(500);
+        delay(interval);
         digitalWrite(led, LOW );
-        delay(500);
+        delay(interval);
     }
 }
 
@@ -97,25 +103,23 @@ void turn_off (){
 }
 
 
-void blink_led (byte last_color){
+void blink_led (byte last_color , word interval){
     //time = millis();
  
     if (last_color == 0 || last_color == t_RED ){
         for (int i = 0 ; i < 10; i ++){
             turn_red();
-            delay(500);
+            delay(interval);
             turn_off();
-            delay(500);
+            delay(interval);
         }    
     }else{
 
-            for (int i = 0 ; i < 10; i ++){
-            
-            
+            for (int i = 0 ; i < 10; i ++){                
             turn_green();
-            delay(500);
+            delay(interval);
             turn_off();
-            delay(500);
+            delay(interval);
             
         }    
 
@@ -143,7 +147,7 @@ void loop()
     //time = millis();
     switch (job){
         case 0: 
-            Serial.print("Enter a commaand: ");
+            Serial.print("Enter a command: ");
             job ++;
             break;
         case 1:
@@ -235,32 +239,10 @@ void loop()
                     }
 
                 }
-                temp = count_digits - 1 ;
 
-                for (byte i = 0; i < count_digits ; i ++) {
 
-                    
-                    interval += ( number_array[i]-48 ) * pow(10,temp ) ;
-                    temp --;
-                    
-                    if ( temp < 0 ){
-                        break;
-                    }
-                }
+                //Serial.print( interval );
 
-                Serial.print( interval );
-
-                //for (byte j = 0 ; j <= count_digits ; j ++ ){
-                //        Serial.print( j );
-                //}
-
-                // if (count_digits > 0){
-                //     for (byte i = count_digits - 1 ; i >= 0; i -- ){
-                //     interval += ( pow(10, i) * number_array [i] ) ;
-                //     }
-                // }
-                
-                //Serial.print(interval);
                 Serial.println();
 
                 tokenBuffer[token_buffer_count] = t_EOL;
@@ -279,7 +261,7 @@ void loop()
                         last_color = t_GREEN;
                         break;
                     case t_BLINK:
-                        blink_led(last_color);    
+                        blink_led(last_color , interval);    
                         last_color = 0;
                         break;
                     case t_ON:
@@ -315,11 +297,25 @@ void loop()
                         D13_turn_off();
                         break;
                     case t_BLINK:
-                        D13_turn_blink ();
+                        D13_turn_blink (interval);
                         break;
                         
                     default:
                         break;
+                    }
+                break;
+
+                case t_SET:
+                    if ( tokenBuffer[1] == t_BLINK ){
+                        temp = count_digits - 1 ;
+                        interval = 0;
+                        for (byte i = 0; i < count_digits ; i ++) {
+                        interval += ( number_array[i]-48 ) * pow(10,temp ) ;
+                        temp --;
+                            if ( temp < 0 ){
+                                 break;
+                            }
+                        }
                     }
                 break;
                 
@@ -347,7 +343,7 @@ void loop()
                 for (byte i = 0; i < token_buffer_count; i ++){
                         tokenBuffer[i] = 0;
                     }
-                interval = 0;
+                //interval = 0;
                 count_digits = 0;
                 done_counting = 0;
 
