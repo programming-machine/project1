@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include <math.h>
+
 
 #define      t_LED 2
 #define      t_RED 5
@@ -32,6 +34,10 @@ byte count_space = 0;
 byte final_length = 0 ; //just added
 byte last_color = 0;
 byte led = 13;;
+word interval = 0;
+byte count_digits = 0;
+byte number_array [10];
+byte done_counting = 0 ;
 
 
 
@@ -46,6 +52,17 @@ void D13_turn_on (){
 
 void D13_turn_off (){
     digitalWrite(led, LOW );
+}
+
+
+void D13_turn_blink (){
+
+    for (byte i = 0; i < 10; i++){
+        digitalWrite(led, HIGH );
+        delay(500);
+        digitalWrite(led, LOW );
+        delay(500);
+    }
 }
 
 
@@ -92,10 +109,13 @@ void blink_led (byte last_color){
     }else{
 
             for (int i = 0 ; i < 10; i ++){
+            
+            
             turn_green();
             delay(500);
             turn_off();
             delay(500);
+            
         }    
 
     }
@@ -112,9 +132,6 @@ void setup() {
     pinMode(led, OUTPUT);
     pinMode(2,OUTPUT);
     pinMode(3,OUTPUT);
-    //digitalWrite(3, LOW);
-    //digitalWrite(2, HIGH );
-    //turn_green();
 
 }
 
@@ -196,17 +213,38 @@ void loop()
                       //Serial.println( final_length );
 
                             // look up
-                    for (byte i = 0; i < 13 ; i ++){
-                        if (lookUp_array[i][0] == first_char && lookUp_array[i][1] == second_char && 
-                        lookUp_array[i][2] == final_length ){
-                          //Serial.println("hi");
-                          tokenBuffer[token_buffer_count] = lookUp_array[i][3];
-                          token_buffer_count ++; 
+                        for (byte i = 0; i < 13 ; i ++){
+                             if (lookUp_array[i][0] == first_char && lookUp_array[i][1] == second_char && 
+                                lookUp_array[i][2] == final_length ){
+                                //Serial.println("hi");
+                                tokenBuffer[token_buffer_count] = lookUp_array[i][3];
+                                token_buffer_count ++; 
+                            }
                         }
+
                     }
+                    if (tokenBuffer[0] == t_SET && tokenBuffer[1] == t_BLINK){
+                            
+                        if ( buffer[i] >= 48 && buffer[i] <= 57 && done_counting == 0){
+                            number_array[count_digits] = buffer[i];
+                            count_digits ++;
+                            
+                        }else{
+                            done_counting = 1;
+                        }
+                                        
                     }
 
                 }
+
+                if (count_digits > 0){
+                    for (byte i = count_digits - 1 ; i >= 0; i -- ){
+                    interval += ( pow(10, i) * number_array [i] ) ;
+                    }
+                }
+                
+                Serial.print(interval);
+                Serial.println();
 
                 tokenBuffer[token_buffer_count] = t_EOL;
 
@@ -259,7 +297,10 @@ void loop()
                     case t_OFF:
                         D13_turn_off();
                         break;
-                    
+                    case t_BLINK:
+                        D13_turn_blink ();
+                        break;
+                        
                     default:
                         break;
                     }
@@ -289,10 +330,12 @@ void loop()
                 for (byte i = 0; i < token_buffer_count; i ++){
                         tokenBuffer[i] = 0;
                     }
-
+                interval = 0;
+                count_digits = 0;
+                done_counting = 0;
 
                 break;
         default:
                 break;  
     }
-}
+}-
