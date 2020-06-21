@@ -39,6 +39,8 @@ byte count_digits = 0;
 byte number_array [10];
 byte done_counting = 0 ;
 byte temp = 0;
+byte status_led = 0;
+byte status_d13 = 0;
 
 
 
@@ -255,20 +257,25 @@ void loop()
                     case t_RED:
                         turn_red();
                         last_color = t_RED;
+                        status_led = 1;
                         break;
                     case t_GREEN:
                         turn_green();
                         last_color = t_GREEN;
+                        status_led = 1; 
                         break;
                     case t_BLINK:
                         blink_led(last_color , interval);    
                         last_color = 0;
+                        status_led = 0;
                         break;
                     case t_ON:
                         turn_on();
+                        status_led = 1;
                         break;
                     case t_OFF:
                         turn_off();
+                        status_led = 0;
                         break;
                     default:
                         break;
@@ -277,11 +284,16 @@ void loop()
                 case t_HELP:
                     Serial.println();
                     Serial.println();
+                    Serial.println( "LED: bi-color LED on the board" );
+                    Serial.println( "D13: D13 LED on the beard" );
                     Serial.println( "on: turns on" );
                     Serial.println( "off: turns off" );
                     Serial.println( "green: truns Green" );
                     Serial.println( "red: truns RED" );
                     Serial.println( "blink: led blinks" );
+                    Serial.println( "set blink: setting up the interval for blinking" );
+                    Serial.println( "Status: Prints the status of LEDs" );
+                    Serial.println( "Version: Prints the version of program" );
                     Serial.println();
                     Serial.println();
                 break;
@@ -292,12 +304,15 @@ void loop()
                     {
                     case t_ON:
                         D13_turn_on();
+                        status_d13 = 1;
                         break;
                     case t_OFF:
                         D13_turn_off();
+                        status_d13 = 0;
                         break;
                     case t_BLINK:
                         D13_turn_blink (interval);
+                        status_d13 = 0;
                         break;
                         
                     default:
@@ -318,8 +333,29 @@ void loop()
                         }
                     }
                 break;
-                
+
+                case t_STATUS:
+                    
+                    if (tokenBuffer[1] == t_LEDS){
+                        if (status_led == 0 ){
+                            Serial.println("LED is off");
+                        }else{
+                            Serial.println("LED is on");
+                        }
+                        if (status_d13 == 0){
+                            Serial.println("D13 is off");
+                        }else{
+                            Serial.println("D13 is on");
+                        }
+                    }         
+                break;
+
+                case t_VERSION:
+                    Serial.println( "VERSION 2" );
+
+                break;
                 default:
+                    Serial.println("INVALID command");
                     break;
 
                 }
