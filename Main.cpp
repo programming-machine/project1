@@ -38,6 +38,7 @@ word interval = 0;
 byte count_digits = 0;
 byte number_array [10];
 byte done_counting = 0 ;
+byte temp = 0;
 
 
 
@@ -225,25 +226,41 @@ void loop()
                     }
                     if (tokenBuffer[0] == t_SET && tokenBuffer[1] == t_BLINK){
                             
-                        if ( buffer[i] >= 48 && buffer[i] <= 57 && done_counting == 0){
+                        if ( buffer[i] >= 48 && buffer[i] <= 57 ){
                             number_array[count_digits] = buffer[i];
                             count_digits ++;
                             
-                        }else{
-                            done_counting = 1;
                         }
                                         
                     }
 
                 }
+                temp = count_digits - 1 ;
 
-                if (count_digits > 0){
-                    for (byte i = count_digits - 1 ; i >= 0; i -- ){
-                    interval += ( pow(10, i) * number_array [i] ) ;
+                for (byte i = 0; i < count_digits ; i ++) {
+
+                    
+                    interval += ( number_array[i]-48 ) * pow(10,temp ) ;
+                    temp --;
+                    
+                    if ( temp < 0 ){
+                        break;
                     }
                 }
+
+                Serial.print( interval );
+
+                //for (byte j = 0 ; j <= count_digits ; j ++ ){
+                //        Serial.print( j );
+                //}
+
+                // if (count_digits > 0){
+                //     for (byte i = count_digits - 1 ; i >= 0; i -- ){
+                //     interval += ( pow(10, i) * number_array [i] ) ;
+                //     }
+                // }
                 
-                Serial.print(interval);
+                //Serial.print(interval);
                 Serial.println();
 
                 tokenBuffer[token_buffer_count] = t_EOL;
