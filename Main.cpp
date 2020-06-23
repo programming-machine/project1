@@ -42,6 +42,9 @@ byte temp = 0;
 byte status_led = 0;
 byte status_d13 = 0;
 
+byte blink_state = 0; 
+long blink_time = 0;
+
 
 
 byte lookUp_array[13][4] = 
@@ -105,31 +108,26 @@ void turn_off (){
 }
 
 
-void blink_led (byte last_color , word interval){
-    //time = millis();
- 
-    if (last_color == 0 || last_color == t_RED ){
-        for (int i = 0 ; i < 10; i ++){
-            turn_red();
-            delay(interval);
-            turn_off();
-            delay(interval);
-        }    
-    }else{
-
-            for (int i = 0 ; i < 10; i ++){                
-            turn_green();
-            delay(interval);
-            turn_off();
-            delay(interval);
-            
-        }    
-
+void blink_led () {
+    if (blink_state == 0){
+        //Serial.print("hah");
+        return;
     }
-        
-            
-    
-
+    if (blink_state == 1){
+        turn_on();
+        //Serial.print("jidsa");
+        if (millis() - blink_time >  interval){
+            blink_state ++;
+            blink_time = millis();
+        }
+    }
+    if (blink_state == 2){
+        turn_off();
+        if (millis() - blink_time >  interval){
+            blink_state --;
+            blink_time = millis();
+        }
+    }
 }
 
 
@@ -147,6 +145,7 @@ void setup() {
 void loop()
 {
     //time = millis();
+    blink_led();
     switch (job){
         case 0: 
             Serial.print("Enter a command: ");
@@ -264,10 +263,11 @@ void loop()
                         last_color = t_GREEN;
                         status_led = 1; 
                         break;
-                    case t_BLINK:
-                        blink_led(last_color , interval);    
+                    case t_BLINK:    
                         last_color = 0;
                         status_led = 0;
+                        blink_state = 1;
+                        blink_time = millis();
                         break;
                     case t_ON:
                         turn_on();
@@ -276,6 +276,7 @@ void loop()
                     case t_OFF:
                         turn_off();
                         status_led = 0;
+                        blink_state = 0;
                         break;
                     default:
                         break;
@@ -309,10 +310,13 @@ void loop()
                     case t_OFF:
                         D13_turn_off();
                         status_d13 = 0;
+                        blink_state = 0;
                         break;
                     case t_BLINK:
                         D13_turn_blink (interval);
                         status_d13 = 0;
+                        blink_state = 1;
+                        blink_time = millis();
                         break;
                         
                     default:
@@ -360,10 +364,10 @@ void loop()
 
                 }
                     
-                    for (byte i = 0; i <= token_buffer_count ; i ++){
-                        Serial.print((byte)tokenBuffer[i]);
-                        Serial.print( ' ' );
-                    }
+                    //for (byte i = 0; i <= token_buffer_count ; i ++){
+                    //    Serial.print((byte)tokenBuffer[i]);
+                    //    Serial.print( ' ' );
+                    //}
 
 
 
