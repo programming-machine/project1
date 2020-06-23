@@ -1,5 +1,8 @@
 #include <Arduino.h>
 #include <math.h>
+using byte = unsigned char; 
+using namespace std; 
+
 
 
 #define      t_LED 2
@@ -16,8 +19,12 @@
 #define  t_VERSION 9
 #define     t_HELP 10
 
-using byte = unsigned char; 
-using namespace std; 
+byte lookUp_array[13][4] = 
+{{'l','e',3,t_LED},{'r','e',3,t_RED},{'e','o',3,t_EOL},{'d','1',3,t_D13},{'o','n',2,t_ON},
+{'o','f',3,t_OFF},{'b','l',5,t_BLINK},{'g','r',5,t_GREEN},{'s','e',3,t_SET},{'s','t',6,t_STATUS},
+{'l','e',4,t_LEDS},{'v','e',7,t_VERSION},{'h','e',4,t_HELP}};
+
+
 
 char buffer [40];
 byte newChar;
@@ -32,8 +39,8 @@ byte token_buffer_count =0;
 byte command_length =0;
 byte count_space = 0;
 byte final_length = 0 ; //just added
-byte last_color = 0;
-byte led = 13;;
+byte last_color = t_RED;
+byte led = 13;
 word interval = 500;
 byte count_digits = 0;
 byte number_array [10];
@@ -41,63 +48,74 @@ byte done_counting = 0 ;
 byte temp = 0;
 byte status_led = 0;
 byte status_d13 = 0;
+byte blink_state_LED = 0; 
+long blink_time_LED = 0;
 
-
-
-byte lookUp_array[13][4] = 
-{{'l','e',3,t_LED},{'r','e',3,t_RED},{'e','o',3,t_EOL},{'d','1',3,t_D13},{'o','n',2,t_ON},
-{'o','f',3,t_OFF},{'b','l',5,t_BLINK},{'g','r',5,t_GREEN},{'s','e',3,t_SET},{'s','t',6,t_STATUS},
-{'l','e',4,t_LEDS},{'v','e',7,t_VERSION},{'h','e',4,t_HELP}};
-
-
+byte blink_state_d13 = 0; 
+long blink_time_d13 = 0;
 
 
 
 
-void D13_turn_on (){
+
+
+
+void turn_on_D13 (){
     digitalWrite(led, HIGH );
 }
 
-void D13_turn_off (){
+void turn_off_D13 (){
     digitalWrite(led, LOW );
 }
 
 
-void D13_turn_blink ( word interval ){
+void blink_D13 ( ){
 
+    
+    if (blink_state_d13 == 0){
 
-    for (byte i = 0; i < 10; i++){
-        digitalWrite(led, HIGH );
-        delay(interval);
-        digitalWrite(led, LOW );
-        delay(interval);
+        return;
+    }
+    if (blink_state_d13 == 1){
+        turn_on_D13();
+        if (millis() - blink_time_d13 >  interval){
+            blink_state_d13 ++;
+            blink_time_d13 = millis();
+        }
+    }
+    if (blink_state_d13 == 2){
+        turn_off_D13();
+        if (millis() - blink_time_d13 >  interval){
+            blink_state_d13 --;
+            blink_time_d13 = millis();
+        }
     }
 }
 
 
 
-void turn_red (){
+void turn_red_LED (){
     digitalWrite(3, LOW);
     digitalWrite(2, HIGH );
 
 
 }
 
-void turn_green (){
+void turn_green_LED (){
     digitalWrite(2, LOW);
     digitalWrite(3, HIGH );
 
 }
 
 
-void turn_on (){
+void turn_on_LED (){
     digitalWrite(2, LOW);
     digitalWrite(3, HIGH );
 
 }
 
 
-void turn_off (){
+void turn_off_LED (){
     
     digitalWrite(2, HIGH);
     digitalWrite(3, HIGH );
@@ -105,31 +123,29 @@ void turn_off (){
 }
 
 
-void blink_led (byte last_color , word interval){
-    //time = millis();
- 
-    if (last_color == 0 || last_color == t_RED ){
-        for (int i = 0 ; i < 10; i ++){
-            turn_red();
-            delay(interval);
-            turn_off();
-            delay(interval);
-        }    
-    }else{
 
-            for (int i = 0 ; i < 10; i ++){                
-            turn_green();
-            delay(interval);
-            turn_off();
-            delay(interval);
-            
-        }    
 
+void blink_led () {
+
+    if (blink_state_LED == 0){
+
+        return;
     }
+    if (blink_state_LED == 1){
         
-            
-    
-
+        turn_on_LED();
+        if (millis() - blink_time_LED >  interval){
+            blink_state_LED ++;
+            blink_time_LED = millis();
+        }
+    }
+    if (blink_state_LED == 2){
+        turn_off_LED();
+        if (millis() - blink_time_LED >  interval){
+            blink_state_LED --;
+            blink_time_LED = millis();
+        }
+    }
 }
 
 
@@ -146,7 +162,10 @@ void setup() {
 
 void loop()
 {
-    //time = millis();
+    //blinking LED
+    blink_led();
+    blink_D13 ();
+
     switch (job){
         case 0: 
             Serial.print("Enter a command: ");
@@ -158,16 +177,7 @@ void loop()
                 buffer[index] = newChar;
                 Serial.print( buffer[index]);
                 
-                // if (newChar != 127){
-                //     buffer[index] = newChar;
-                //     Serial.print( buffer[index]);
-                // }else{
-                //     //buffer[index] = buffer[ index + 1] ;
-                //     buffer.remove(index)
-                //     Serial.print( buffer[index]);
-                //     index = index -1;
-                
-                // }
+                // impelenting the backspace
 
                 if(newChar != 13){
                     index ++;
@@ -255,27 +265,29 @@ void loop()
                     switch (tokenBuffer[1])
                     {
                     case t_RED:
-                        turn_red();
-                        last_color = t_RED;
                         status_led = 1;
+                        turn_red_LED();
+                        last_color = t_RED;
                         break;
                     case t_GREEN:
-                        turn_green();
+                        status_led = 1;
+                        turn_green_LED();
                         last_color = t_GREEN;
-                        status_led = 1; 
                         break;
-                    case t_BLINK:
-                        blink_led(last_color , interval);    
-                        last_color = 0;
-                        status_led = 0;
+                    case t_BLINK:    
+                        status_led = 2;
+                        blink_state_LED = 1;
+                        blink_time_LED = millis();
                         break;
                     case t_ON:
-                        turn_on();
+                        blink_state_LED = 0;
                         status_led = 1;
+                        turn_on_LED();
                         break;
                     case t_OFF:
-                        turn_off();
                         status_led = 0;
+                        turn_off_LED();
+                        blink_state_LED = 0;
                         break;
                     default:
                         break;
@@ -284,15 +296,15 @@ void loop()
                 case t_HELP:
                     Serial.println();
                     Serial.println();
-                    Serial.println( "LED: bi-color LED on the board" );
+                    Serial.println( "led: bi-color LED on the board" );
                     Serial.println( "D13: D13 LED on the beard" );
                     Serial.println( "on: turns on" );
                     Serial.println( "off: turns off" );
                     Serial.println( "green: truns Green" );
                     Serial.println( "red: truns RED" );
-                    Serial.println( "blink: led blinks" );
+                    Serial.println( "blink: LED blinks" );
                     Serial.println( "set blink: setting up the interval for blinking" );
-                    Serial.println( "Status: Prints the status of LEDs" );
+                    Serial.println( "Status leds: Prints the status of LEDs" );
                     Serial.println( "Version: Prints the version of program" );
                     Serial.println();
                     Serial.println();
@@ -303,16 +315,19 @@ void loop()
                     switch (tokenBuffer[1])
                     {
                     case t_ON:
-                        D13_turn_on();
                         status_d13 = 1;
+                        blink_state_d13 = 0;
+                        turn_on_D13();
                         break;
                     case t_OFF:
-                        D13_turn_off();
                         status_d13 = 0;
+                        blink_state_d13 = 0;
+                        turn_off_D13();
                         break;
                     case t_BLINK:
-                        D13_turn_blink (interval);
-                        status_d13 = 0;
+                        status_d13 = 2;
+                        blink_state_d13 = 1; 
+                        blink_time_d13 = millis();
                         break;
                         
                     default:
@@ -339,19 +354,23 @@ void loop()
                     if (tokenBuffer[1] == t_LEDS){
                         if (status_led == 0 ){
                             Serial.println("LED is off");
-                        }else{
+                        }else if ( status_led == 1 ){
                             Serial.println("LED is on");
+                        }else if ( status_led == 2 ){
+                            Serial.println("LED is blinking");
                         }
                         if (status_d13 == 0){
                             Serial.println("D13 is off");
-                        }else{
+                        }else if ( status_d13 == 1 ){
                             Serial.println("D13 is on");
+                        }else if ( status_d13 == 2 ){
+                            Serial.println("D13 is blinking");
                         }
                     }         
                 break;
 
                 case t_VERSION:
-                    Serial.println( "VERSION 2" );
+                    Serial.println( "VERSION 3" );
 
                 break;
                 default:
@@ -359,13 +378,6 @@ void loop()
                     break;
 
                 }
-                    
-                    for (byte i = 0; i <= token_buffer_count ; i ++){
-                        Serial.print((byte)tokenBuffer[i]);
-                        Serial.print( ' ' );
-                    }
-
-
 
                      Serial.println(  );
                 job = 0;
