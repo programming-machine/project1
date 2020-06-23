@@ -1,3 +1,34 @@
+Skip to content
+Search or jump to…
+
+Pull requests
+Issues
+Marketplace
+Explore
+ 
+@programming-machine 
+Learn Git and GitHub without any code!
+Using the Hello World guide, you’ll start a branch, write comments, and open a pull request.
+
+
+programming-machine
+/
+project1
+1
+00
+ Code
+ Issues 0
+ Pull requests 0 Actions
+ Projects 0
+ Wiki
+ Security 0
+ Insights
+ Settings
+project1/Main.cpp
+@programming-machine programming-machine Update Main.cpp
+67ce481 now
+394 lines (315 sloc)  10.9 KB
+ 
 #include <Arduino.h>
 #include <math.h>
 
@@ -392,3 +423,15 @@ void loop()
                 break;  
     }
 }
+© 2020 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Help
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
