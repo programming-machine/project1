@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <math.h>
+
 using byte = unsigned char; 
 using namespace std; 
 
@@ -55,11 +56,6 @@ byte blink_state_d13 = 0;
 long blink_time_d13 = 0;
 
 
-
-
-
-
-
 void turn_on_D13 (){
     digitalWrite(led, HIGH );
 }
@@ -109,8 +105,11 @@ void turn_green_LED (){
 
 
 void turn_on_LED (){
-    digitalWrite(2, LOW);
-    digitalWrite(3, HIGH );
+    if (last_color == t_GREEN){
+        turn_green_LED();
+    }else{
+        turn_red_LED();
+    }
 
 }
 
@@ -132,8 +131,11 @@ void blink_led () {
         return;
     }
     if (blink_state_LED == 1){
-        
-        turn_on_LED();
+        if ( last_color == t_GREEN ){
+            turn_green_LED();
+        }else{
+            turn_red_LED();
+        }
         if (millis() - blink_time_LED >  interval){
             blink_state_LED ++;
             blink_time_LED = millis();
@@ -148,8 +150,6 @@ void blink_led () {
     }
 }
 
-
-
 void setup() {
     Serial.begin(9600);
     pinMode(led, OUTPUT);
@@ -157,8 +157,6 @@ void setup() {
     pinMode(3,OUTPUT);
 
 }
-
-
 
 void loop()
 {
